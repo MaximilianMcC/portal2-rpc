@@ -1,0 +1,70 @@
+{
+	// Don't touch this unless you know what you're doing.
+	"clientId": "1258253632785350787",
+
+	// If you change your portal 2 installataion directory
+	// then change completedSetup to false. The path will be
+	// updated next time you start the RPC.
+	"completedSetup": true,
+	"portal2Location": "D:\\games\\steam\\steamapps\\common\\Portal 2\\portal2",
+
+	// General settings of what to show on the status.
+	"rpcEnabled": true,
+	"showMapStatus": true,
+	"showPortalGunStatus": true,
+
+	// Different status messages depending on what type of
+	// portalgun you have equipped
+	"portalgunStatus": {
+		"noneText": "",
+		"noneSmallImage": "",
+		
+		"singleText": "Single portal device",
+		"singleSmallImage": "single_portal_crosshair",
+
+		"dualText": "Dual portal device",
+		"dualSmallImage": "dual_portal_crosshair"
+	},
+
+	// Different status messages depending on what
+	// you're currently doing in the game. Story parts have
+	// support for different images per chapter to match
+	// how the game environments change as you progress.
+	"menuStatus": {
+		"topLine": "In the main menu",
+		"bottomLine": "",
+		"largeImage": "modern_aperture_logo"
+	},
+	"loadingStatus": {
+		"topLine": "Loading a chamber",
+		"bottomLine": "",
+		"largeImage": "modern_aperture_logo"
+	},
+	"communityChamberStatus": {
+		"topLine": "Playing a workshop map",
+		"bottomLine": "",
+		"largeImage": "modern_aperture_logo"
+	},
+	"singleplayerStoryStatus": {
+		"topLine": "Playing the story",
+		"bottomLine": "{chapter} - {title}",
+		"chapter1LargeImage": "run_down_modern_aperture_logo",
+		"chapter2LargeImage": "run_down_modern_aperture_logo",
+		"chapter3LargeImage": "run_down_modern_aperture_logo",
+		"chapter4LargeImage": "modern_aperture_logo",
+		"chapter5LargeImage": "modern_aperture_logo",
+		"chapter6LargeImage": "1950s_aperture_logo",
+		"chapter7LargeImage": "1970s_aperture_logo",
+		"chapter9LargeImage": "wheatley_aperture_logo"
+	},
+	"cooperativeStoryStatus": {
+		"topLine": "Playing the co-op story",
+		"bottomLine": "{course} - {title}",
+		"course1LargeImage": "modern_aperture_logo",
+		"course2LargeImage": "run_down_modern_aperture_logo",
+		"course3LargeImage": "run_down_modern_aperture_logo",
+		"course4LargeImage": "modern_aperture_logo",
+		"course5LargeImage": "1970s_aperture_logo",
+		"course6LargeImage": "1970s_aperture_logo"
+	}
+}
