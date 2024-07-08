@@ -43,7 +43,7 @@ class Program
 		fileWatcher.EnableRaisingEvents = true;
 
 		Console.ReadKey();
-		Client.Dispose();
+		Shutdown(fileWatcher.Path);
 	}
 
 	private static void AttemptToUpdateStatus(object sender, FileSystemEventArgs e)
@@ -60,21 +60,30 @@ class Program
 
 		// Parse the output to determine where
 		// the user currently is in the game
-		string status = "unknown";
+		string status = "In the Main Menu";
 		foreach (string line in output)
 		{
 			if (line.Contains("Host_NewGame on map")) status = "Loading a chamber";
 			if (line.Contains("==== calling mapspawn.nut")) status = "Playing a chamber";
-			if (line.Contains("from server (Server shutting down)")) status = "In the Main Menu";
+			if (line.Contains("from server (Server shutting down)") || line.Contains("Dropped ")) status = "In the Main Menu";
+			if (line.Contains("Host_WriteConfiguration: Wrote cfg/config.cfg")) Shutdown(e.FullPath);
 		}
+
+		// Update the RPC status if it has changed
+		if (Presence.Details == status) return;
+		Console.WriteLine($"[{Console.ForegroundColor = ConsoleColor.Cyan}{DateTime.UtcNow}{Console.ResetColor}] {status}");
+		Presence.Details = status;
+		Client.SetPresence(Presence);
+	}
+
+	private static void Shutdown(string logFilePath)
+	{
+		// Turn off the presence
+		Client.Dispose();
 
 		// Clear the file so that we don't have a
 		// massive log file and so that we keep clean
-		// File.WriteAllText(e.FullPath, "");
+		File.Delete(logFilePath);
 
-		// Update the RPC status
-		Console.WriteLine($"[{DateTime.UtcNow}] Detected new status: {status}");
-		Presence.Details = status;
-		Client.SetPresence(Presence);
 	}
 }
