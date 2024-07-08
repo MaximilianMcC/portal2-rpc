@@ -9,16 +9,11 @@ class Program
 	{
 		// Give a fancy title thingy
 		Console.Title = "Portal 2 RPC";
-		Console.WriteLine("     Portal 2 Discord Rich Presence");
-		Console.WriteLine("--------------------------------------------");
 
-		// Instructions
-		Console.WriteLine("1. Launch Portal 2");
-		Console.WriteLine("2. Open the developer console");
-		Console.WriteLine("3. Run 'con_logfile console.log'");
-		Console.WriteLine("4. Press any key on this window to start the Rich Presence");
-		Console.ReadKey(true);
-		Console.WriteLine("--------------------------------------------");
+		// Config stuff
+		ConfigHandler.Initialize();
+
+
 
 		// Start and enable the rich presence 
 		Client = new DiscordRpcClient("1258253632785350787");
@@ -32,7 +27,7 @@ class Program
 			Details = "Debugulations rn"
 		};
 		Client.SetPresence(Presence);
-		Console.WriteLine("Rich presence started!");
+		Print("Rich presence started!");
 
 		// Setup the file watcher so that every time the
 		// config file is edited we can do something
@@ -71,19 +66,36 @@ class Program
 
 		// Update the RPC status if it has changed
 		if (Presence.Details == status) return;
-		Console.WriteLine($"[{Console.ForegroundColor = ConsoleColor.Cyan}{DateTime.UtcNow}{Console.ResetColor}] {status}");
+		Print(status);
 		Presence.Details = status;
 		Client.SetPresence(Presence);
 	}
 
 	private static void Shutdown(string logFilePath)
 	{
-		// Turn off the presence
+		// Turn off the presence if its not already off
+		if (Client.IsDisposed) return;
 		Client.Dispose();
 
 		// Clear the file so that we don't have a
 		// massive log file and so that we keep clean
 		File.Delete(logFilePath);
 
+		Print("Shutting down RPC");
+	}
+
+
+
+	// Fancy print thingy with a timestamp and whatnot
+	public static void Print(string status)
+	{
+		Console.ForegroundColor = ConsoleColor.DarkGray;
+		Console.Write("[");
+		Console.ForegroundColor = ConsoleColor.Cyan;
+		Console.Write(DateTime.UtcNow);
+		Console.ForegroundColor = ConsoleColor.DarkGray;
+		Console.Write("] ");
+		Console.ResetColor();
+		Console.WriteLine(status);
 	}
 }
