@@ -1,36 +1,53 @@
-﻿using DiscordRPC;
+﻿using System.Diagnostics;
+using DiscordRPC;
 using TinyDialogsNet;
 
 class Program
 {
-	public static DiscordRpcClient Client;
-	public static RichPresence Presence;
-
 	public static void Main(string[] args)
 	{
 		// Give a fancy title thingy
 		Console.Title = "Portal 2 RPC config settings thing";
 
-		// Config stuff
+		// Load/create the config file
 		ConfigHandler.Initialize();
 
 		// Check for if they have setup everything. If not
 		// then guide them through the setup process
 		Setup();
 
-		// Start and enable the rich presence 
-		Client = new DiscordRpcClient("1258253632785350787");
-		Client.Initialize();
-
-		// Set the initial presence
-		Presence = new RichPresence()
+		// Check for if the game is running
+		bool gamePerviouslyRunning = false;
+		string portal2ExePath = Path.Join(ConfigHandler.Config.Portal2Directory, "..", "portal2.exe");
+		string processName = Path.GetFileNameWithoutExtension(portal2ExePath);
+		while (true)
 		{
-			Assets = new Assets() { LargeImageKey = "aperture_logo_blue" },
-			Timestamps = new Timestamps() { Start = DateTime.UtcNow },
-			Details = "Debugulations rn"
-		};
-		Client.SetPresence(Presence);
-		Print("Rich presence started!");
+			// Check for if the game is running
+			bool gameCurrentlyRunning = Process.GetProcessesByName(processName).Any();
+
+			// If the game has only just opened now then
+			// start all of the rich presence stuff
+			if (gamePerviouslyRunning == false && gameCurrentlyRunning)
+			{
+				// Start the presence
+				Print("Detected Portal 2 open. Starting presence.");
+				PresenceHandler.Start();
+			}
+
+			// If the game has only just been closed
+			// then stop all of the rich presence stuff
+			if (gamePerviouslyRunning && gameCurrentlyRunning == false)
+			{
+				// Stop the presence
+				Print("Detected Portal 2 closed. Stopping presence.");
+				PresenceHandler.Stop();
+			}
+
+			// Wait 5 seconds so that we don't spam
+			// and update the previously running status
+			Thread.Sleep(5000);
+			gamePerviouslyRunning = gameCurrentlyRunning;
+		}
 
 		// Setup the file watcher so that every time the
 		// config file is edited we can do something
@@ -41,7 +58,6 @@ class Program
 		fileWatcher.EnableRaisingEvents = true;
 
 		Console.ReadKey();
-		Shutdown(fileWatcher.Path);
 	}
 
 	private static void Setup()
@@ -123,27 +139,14 @@ class Program
 			if (line.Contains("Host_NewGame on map")) status = "Loading a chamber";
 			if (line.Contains("==== calling mapspawn.nut")) status = "Playing a chamber";
 			if (line.Contains("from server (Server shutting down)") || line.Contains("Dropped ")) status = "In the Main Menu";
-			if (line.Contains("Host_WriteConfiguration: Wrote cfg/config.cfg")) Shutdown(e.FullPath);
+			if (line.Contains("Host_WriteConfiguration: Wrote cfg/config.cfg")) PresenceHandler.Stop();
 		}
 
 		// Update the RPC status if it has changed
-		if (Presence.Details == status) return;
-		Print(status);
-		Presence.Details = status;
-		Client.SetPresence(Presence);
-	}
-
-	private static void Shutdown(string logFilePath)
-	{
-		// Turn off the presence if its not already off
-		if (Client.IsDisposed) return;
-		Client.Dispose();
-
-		// Clear the file so that we don't have a
-		// massive log file and so that we keep clean
-		File.Delete(logFilePath);
-
-		Print("Shutting down RPC");
+		// if (Presence.Details == status) return;
+		// Print(status);
+		// Presence.Details = status;
+		// Client.SetPresence(Presence);
 	}
 
 
